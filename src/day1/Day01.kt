@@ -8,14 +8,14 @@ import kotlin.text.StringBuilder
 fun main() {
     fun part1(input: List<String>): Int {
         return input.sumOf { it ->
-            val firstIdx = it.asIterable().indexOfFirst { it.isDigit() }
-            val lastIdx = it.asIterable().indexOfLast { it.isDigit() }
+            val firstIdx = it.indexOfFirst { it.isDigit() }
+            val lastIdx = it.indexOfLast { it.isDigit() }
             StringBuilder().append(it[firstIdx]).append(it[lastIdx]).toString().toInt()
         }
     }
 
     fun part2(input: List<String>): Int {
-        val digits = listOf(
+        val digits = setOf(
                 "1",
                 "2",
                 "3",
@@ -36,9 +36,19 @@ fun main() {
                 "nine"
         )
         return input.sumOf {
-            val first = it.findAnyOf(digits)?.second?.parseDigit()
-            val second = it.findLastAnyOf(digits)?.second?.parseDigit()
-            "$first$second".toInt()
+            val mutableList = mutableListOf<String>()
+            for (i in it.indices) {
+                for (j in i .. it.length) {
+                    val substring = it.substring(i,j)
+                    if (substring in digits) {
+                        mutableList.add(substring)
+                        break
+                    }
+                }
+            }
+            val first = mutableList.first().parseDigit()
+            val second = mutableList.last().parseDigit()
+            (first + second).toInt()
         }
     }
 
