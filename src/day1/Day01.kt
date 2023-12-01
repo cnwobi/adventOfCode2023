@@ -1,54 +1,28 @@
 package day1
 
-import parseDigit
 import println
 import readInput
-import kotlin.text.StringBuilder
 
 fun main() {
     fun part1(input: List<String>): Int {
         return input.sumOf { it ->
             val firstIdx = it.indexOfFirst { it.isDigit() }
             val lastIdx = it.indexOfLast { it.isDigit() }
-            StringBuilder().append(it[firstIdx]).append(it[lastIdx]).toString().toInt()
+            "${it[firstIdx]}${it[lastIdx]}".toInt()
         }
     }
 
     fun part2(input: List<String>): Int {
-        val digits = setOf(
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-                "8",
-                "9",
-                "one",
-                "two",
-                "three",
-                "four",
-                "five",
-                "six",
-                "seven",
-                "eight",
-                "nine"
+        val wordToDigitMap: MutableMap<String, String> = mutableMapOf(
+                "one" to "1", "two" to "2", "three" to "3", "four" to "4", "five" to "5", "six" to "6", "seven" to "7", "eight" to "8", "nine" to "9"
         )
-        return input.sumOf {
-            val mutableList = mutableListOf<String>()
-            for (i in it.indices) {
-                for (j in i .. it.length) {
-                    val substring = it.substring(i,j)
-                    if (substring in digits) {
-                        mutableList.add(substring)
-                        break
-                    }
-                }
+        wordToDigitMap.putAll((1..9).associate { it.toString() to it.toString() })
+
+        return input.sumOf {line ->
+            val numbers = line.indices.flatMap { i ->
+                (i until line.length).mapNotNull { j -> wordToDigitMap.getOrElse(line.substring(i, j + 1)){null} }
             }
-            val first = mutableList.first().parseDigit()
-            val second = mutableList.last().parseDigit()
-            (first + second).toInt()
+            "${numbers.first()}${numbers.last()}".toInt()
         }
     }
 
