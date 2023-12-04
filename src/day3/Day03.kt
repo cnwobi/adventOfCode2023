@@ -4,20 +4,23 @@ import println
 import readInput
 
 
-data class Index(val row: Int, val col: Int)
-data class PartNumber(val start: Index, val value: Int)
-data class PartNumberStr(val start: Index, val value: String)
+data class Point(val row: Int, val col: Int)
+data class PartNumber(val start: Point, val value: Int)
+
+data class Element(val point: Point, val ch: Char) {
+    val isAsterisk = ch == '*'
+}
 
 fun main() {
-    val indexToNumber = mutableMapOf<Index, PartNumber>()
+    val pointByPartNumber = mutableMapOf<Point, PartNumber>()
     val delta = listOf(-1, 0, 1)
-    val neighbourIndexDelta = delta.flatMap { d -> delta.map { d2 -> Index(d, d2) } }.filter { it != Index(0, 0) }
+    val neighbourIndexDelta = delta.flatMap { d -> delta.map { d2 -> Point(d, d2) } }.filter { it != Point(0, 0) }
 
     fun populateReverseIndex(row: Int, col: Int, numStr: String) {
-        val coordinateStart = Index(row, col)
+        val coordinateStart = Point(row, col)
         val actualNum = PartNumber(coordinateStart, numStr.toInt())
         for (idx in numStr.indices) {
-            indexToNumber[Index(row, col + idx)] = actualNum
+            pointByPartNumber[Point(row, col + idx)] = actualNum
         }
     }
 
@@ -43,34 +46,33 @@ fun main() {
 
     }
 
+    fun isSymbol(ch: Char) = !ch.isDigit() && ch != '.'
+    fun neighbours(row: Int, col: Int) = neighbourIndexDelta.map { it.copy(row + it.row, col = col + it.col) }.mapNotNull { pointByPartNumber[it] }.toSet()
+
+    fun lineToPartNumbers(row: Int, line: String) =
+            line.mapIndexed { col, ch -> Pair(col, ch) }.filter { isSymbol(it.second) }.flatMap { neighbours(row, it.first) }
+
+
     fun part1(input: List<String>): Int {
         input.forEachIndexed { row, line -> processLine(row, line) }
-        val partNumbers = mutableSetOf<PartNumber>()
 
-        input.forEachIndexed { r, line ->
-            line.forEachIndexed { c, ch ->
-                if (!ch.isDigit() && ch != '.') {
-                    neighbourIndexDelta
-                            .map { it.copy(row = it.row + r, col = it.col + c) }
-                            .forEach { indexToNumber[it]?.let { partNumbers.add(it) } }
-                }
-            }
-        }
-
-        return partNumbers.sumOf { p -> p.value }
+        return input.flatMapIndexed { row, line -> lineToPartNumbers(row, line) }.sumOf { it.value }
     }
-
-    fun getAdjacentNumbers(index: Index) =
-            neighbourIndexDelta.map { n -> n.copy(row = index.row + n.row, col = index.col + n.col) }.mapNotNull { indexToNumber[it] }.toSet()
 
 
     fun part2(input: List<String>): Int {
         input.forEachIndexed { row, line -> processLine(row, line) }
+        fun getAdjacentNumbers(index: Point) =
+                neighbourIndexDelta.map { n -> n.copy(row = index.row + n.row, col = index.col + n.col) }
+                        .mapNotNull { pointByPartNumber[it] }.toSet()
+
+        fun lineToElements(row: Int, line: String) = line.mapIndexed { col, ch -> Element(Point(row, col), ch) }
+
         return input
-                .flatMapIndexed { row, line -> line.mapIndexed { col, ch -> Pair(Index(row, col), ch) } }
+                .flatMapIndexed { row, line -> lineToElements(row, line) }
                 .asSequence()
-                .filter { (_,ch) -> ch == '*' }
-                .map { getAdjacentNumbers(it.first) }
+                .filter { it.isAsterisk }
+                .map { getAdjacentNumbers(it.point) }
                 .filter { it.size == 2 }
                 .map { adjacentNumbers -> adjacentNumbers.fold(1) { acc, partNumber -> acc * partNumber.value } }.sum()
     }
