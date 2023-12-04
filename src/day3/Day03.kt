@@ -11,7 +11,7 @@ data class PartNumberStr(val start: Index, val value: String)
 fun main() {
     val indexToNumber = mutableMapOf<Index, PartNumber>()
     val delta = listOf(-1, 0, 1)
-    val neighbourIndexDelta = delta.flatMap { d -> delta.map { d2 -> Index(d, d2) } }.filter { it != Index(0,0) }
+    val neighbourIndexDelta = delta.flatMap { d -> delta.map { d2 -> Index(d, d2) } }.filter { it != Index(0, 0) }
 
     fun populateReverseIndex(row: Int, col: Int, numStr: String) {
         val coordinateStart = Index(row, col)
@@ -50,13 +50,9 @@ fun main() {
         input.forEachIndexed { r, line ->
             line.forEachIndexed { c, ch ->
                 if (!ch.isDigit() && ch != '.') {
-                    for (i in listOf(-1, 0, 1)) {
-                        for (j in listOf(-1, 0, 1)) {
-                            val neighbour = Index(r + i, c + j)
-                            indexToNumber[neighbour]?.let { partNumbers.add(it) }
-                        }
-                    }
-
+                    neighbourIndexDelta
+                            .map { it.copy(row = it.row + r, col = it.col + c) }
+                            .forEach { indexToNumber[it]?.let { partNumbers.add(it) } }
                 }
             }
         }
@@ -64,21 +60,19 @@ fun main() {
         return partNumbers.sumOf { p -> p.value }
     }
 
-    fun getAdjacentNumbers(delta: List<Int>, it: Pair<Index, Char>) =
-            delta.flatMap { i ->
-                delta.map { j ->
-                    val (index, _) = it
-                    val neighbour = index.copy(row = index.row + i, col = index.col + j)
-                    indexToNumber[neighbour]
-                }
-            }.filterNotNull().toSet()
+    fun getAdjacentNumbers(index: Index) =
+            neighbourIndexDelta.map { n -> n.copy(row = index.row + n.row, col = index.col + n.col) }.mapNotNull { indexToNumber[it] }.toSet()
+
 
     fun part2(input: List<String>): Int {
-        val delta = listOf(-1, 0, 1)
         input.forEachIndexed { row, line -> processLine(row, line) }
-        input.flatMapIndexed { row, line -> line.mapIndexed { col, ch -> Pair(Index(row, col), ch) } }.asSequence().filter { it.second == '*' }
-                .map { getAdjacentNumbers(delta, it) }.filter { it.size == 2 }.map { adjacentNumbers -> adjacentNumbers.fold(1) { acc, partNumber -> acc * partNumber.value } }.sum()
-        return input.size
+        return input
+                .flatMapIndexed { row, line -> line.mapIndexed { col, ch -> Pair(Index(row, col), ch) } }
+                .asSequence()
+                .filter { (_,ch) -> ch == '*' }
+                .map { getAdjacentNumbers(it.first) }
+                .filter { it.size == 2 }
+                .map { adjacentNumbers -> adjacentNumbers.fold(1) { acc, partNumber -> acc * partNumber.value } }.sum()
     }
 
 
