@@ -1,7 +1,7 @@
-package day4
+package main.day4
 
-import println
-import readInput
+import main.println
+import main.readInput
 import java.util.LinkedList
 import java.util.Queue
 import kotlin.math.pow

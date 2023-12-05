@@ -1,7 +1,7 @@
-package day3
+package main.day3
 
-import println
-import readInput
+import main.println
+import main.readInput
 
 
 data class Point(val row: Int, val col: Int)

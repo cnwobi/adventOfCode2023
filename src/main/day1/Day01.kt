@@ -1,7 +1,7 @@
-package day1
+package main.day1
 
-import println
-import readInput
+import main.println
+import main.readInput
 
 fun main() {
     fun part1(input: List<String>): Int {

@@ -1,8 +1,8 @@
-package day2
+package main.day2
 
 
-import println
-import readInput
+import main.println
+import main.readInput
 
 data class Cube(val count: Int, val color: String)
 data class Game(val id: Int, val cubes: List<Cube>) {
