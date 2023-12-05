@@ -20,7 +20,7 @@ fun main() {
 
         return input.sumOf {line ->
             val numbers = line.indices.flatMap { i ->
-                (i until line.length).mapNotNull { j -> wordToDigitMap.getOrElse(line.substring(i, j + 1)){null} }
+                (i until line.length).mapNotNull { j -> wordToDigitMap[line.substring(i, j + 1)] }
             }
             "${numbers.first()}${numbers.last()}".toInt()
         }
