@@ -37,7 +37,7 @@ val stateNameToNextStateName = mapOf(
         "light-to-temperature" to "temperature-to-humidity",
         "temperature-to-humidity" to "humidity-to-location")
 
-data class Range(val name: String, val destinationStart: Long, val start: Long, val range: Long) {
+data class Range(val name: String = "", val destinationStart: Long, val start: Long, val range: Long) {
     val end = start + range - 1
     fun toDestinationStart(source: Long): Long? {
         if (source in start until start + range) {
@@ -55,6 +55,45 @@ data class RangedState(val name: String = "seed-to-soil", val start: Long, val r
     val end = start + range - 1
     val nextState: String? = stateNameToNextStateName[name]
     val endState = !stateNameToNextStateName.containsKey(name)
+
+    fun findIntersection(range: Range): Triple<RangedState?, RangedState?, RangedState?> {
+        if (end < range.start) {
+            return Triple(this.copy(name = nextState!!), null, null)
+        }
+
+        if (start > range.end) {
+            return Triple(null, null, this)
+        }
+
+        val firstStart = min(start, range.start)
+        val firstEnd = min(end, range.start) - 1
+        var range1: RangedState? = null
+        var range2: RangedState? = null
+        var range3: RangedState? = null
+
+        if (firstStart <= firstEnd) {
+            range1 = RangedState(name = nextState!!, start = firstStart, range = firstEnd - firstStart + 1)
+        }
+
+
+        val secondStart = max(start, range.start)
+        val secondEnd = min(end, range.end)
+
+        if (secondStart <= secondEnd) {
+            val newRange = secondEnd - secondStart + 1
+            range2 = RangedState(name = nextState!!, start = range.toDestinationStart(secondStart)!!, range = newRange)
+        }
+
+
+        val thirdStart = min(end, range.end) + 1
+        val thirdEnd = max(end, range.end)
+
+        if (thirdEnd in thirdStart..end) {
+            range3 = RangedState(name = name, start = thirdStart, range = thirdEnd - thirdStart + 1)
+        }
+
+        return Triple(range1, range2, range3)
+    }
 }
 
 
@@ -80,57 +119,31 @@ fun linesToRanges(lines: List<String>): Map<String, List<Range>> {
 }
 
 fun rangedStateToNextStates(rangedState: RangedState, ranges: List<Range>): Set<RangedState> {
-    val rangeMinHeap = PriorityQueue<Range>(compareBy { it.start })
-    rangeMinHeap.addAll(ranges)
-    val stateEndIsBeforeAnyRangeStart = rangedState.end < rangeMinHeap.peek().start
+    val sortedRanges = ranges.sortedBy { it.start }
 
-    if (stateEndIsBeforeAnyRangeStart) {
-        return setOf(rangedState.copy(name = rangedState.nextState!!))
-    }
 
-    val states = mutableSetOf<RangedState>()
+    val states = mutableSetOf<RangedState?>()
+    var currentState: RangedState? = rangedState
 
-    var currentState = rangedState
-    val previousState = currentState
-
-    while (rangeMinHeap.isNotEmpty() && currentState.start < currentState.end) {
-        currentState.println()
-        rangeMinHeap.peek().println()
-
-        val currentStateNotInRange = currentState.start > rangeMinHeap.peek().end
-        if (currentStateNotInRange) {
-            rangeMinHeap.poll()
-            continue
+    for (range in sortedRanges) {
+        if (currentState == null) {
+            break
         }
-
-
-        if (currentState.start < rangeMinHeap.peek().start) {
-            val end = min(currentState.end, rangeMinHeap.peek().start)
-            val newRange = end - currentState.start
-            val foundState = rangedState.copy(name = currentState.nextState!!, start = currentState.start, range = newRange)
-            states.add(foundState)
-            currentState = rangedState.copy(name = currentState.name, start = end, range = currentState.end - end + 1)
-            continue
+        if (currentState.end < range.start) {
+            states.add(currentState.copy(name = currentState.nextState!!))
+            break
         }
-
-        val range = rangeMinHeap.poll()
-        val start = max(rangedState.start, currentState.start)
-        val end = min(currentState.end, range.end) + 1
-        val destinationStart = range.toDestinationStart(start)
-        val newRange = end - start + 1
-        val foundState = rangedState.copy(name = currentState.nextState!!, start = destinationStart!!, range = newRange - 1)
-        states.add(foundState)
-        currentState = currentState.copy(start = end, range = currentState.end - end )
-
+        val (start, mid, end) = currentState.findIntersection(range)
+        states.add(start)
+        states.add(mid)
+        currentState = end
     }
 
-    if (currentState.start < currentState.end) {
-        states.add(currentState.copy(name = currentState.nextState!!, range = currentState.range + 2) )
+    if(currentState != null) {
+        states.add(currentState.copy(name = currentState.nextState!!))
     }
-    if(currentState.start == currentState.end) {
-        states.add(currentState)
-    }
-    return states
+
+    return states.filterNotNull().toSet()
 }
 
 fun stateToStateTransition(seed: State, rangesByStateName: Map<String, List<Range>>): State {
@@ -161,7 +174,7 @@ fun main() {
     fun part2(input: List<String>): String {
         val queue: Queue<RangedState> = LinkedList()
         val (rangedSeeds, ranges) = part2ParseInput(input)
-        queue.addAll(rangedSeeds)
+        queue.add(rangedSeeds.toList()[0])
 
         val endStates = mutableListOf<RangedState>()
         while (queue.isNotEmpty()) {
@@ -170,13 +183,14 @@ fun main() {
                 endStates.add(currState)
                 continue
             }
-            queue.addAll(rangedStateToNextStates(currState, ranges[currState.name]!!))
+            val nextStates = rangedStateToNextStates(currState, ranges[currState.name]!!)
+            queue.addAll(nextStates)
         }
         return "part 2: ${endStates.minOf { it.start }}"
     }
 
-    val input = readInput("day5/day05")
-    part1(input).println()
+    val input = readInput("day5/Sample")
+//    part1(input).println()
     part2(input).println()
 
 }
