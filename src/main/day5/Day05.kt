@@ -91,13 +91,18 @@ fun rangedStateToNextStates(rangedState: RangedState, ranges: List<Range>): Set<
     val states = mutableSetOf<RangedState>()
 
     var currentState = rangedState
+    val previousState = currentState
 
     while (rangeMinHeap.isNotEmpty() && currentState.start < currentState.end) {
+        currentState.println()
+        rangeMinHeap.peek().println()
+
         val currentStateNotInRange = currentState.start > rangeMinHeap.peek().end
         if (currentStateNotInRange) {
             rangeMinHeap.poll()
             continue
         }
+
 
         if (currentState.start < rangeMinHeap.peek().start) {
             val end = min(currentState.end, rangeMinHeap.peek().start)
@@ -113,14 +118,17 @@ fun rangedStateToNextStates(rangedState: RangedState, ranges: List<Range>): Set<
         val end = min(currentState.end, range.end) + 1
         val destinationStart = range.toDestinationStart(start)
         val newRange = end - start + 1
-        val foundState = rangedState.copy(name = currentState.nextState!!, start = destinationStart!!, range = newRange)
+        val foundState = rangedState.copy(name = currentState.nextState!!, start = destinationStart!!, range = newRange - 1)
         states.add(foundState)
-        currentState = currentState.copy(start = end, range = currentState.end - end)
+        currentState = currentState.copy(start = end, range = currentState.end - end )
 
     }
 
     if (currentState.start < currentState.end) {
-        states.add(currentState.copy(name = currentState.nextState!!))
+        states.add(currentState.copy(name = currentState.nextState!!, range = currentState.range + 2) )
+    }
+    if(currentState.start == currentState.end) {
+        states.add(currentState)
     }
     return states
 }
