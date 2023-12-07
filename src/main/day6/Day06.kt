@@ -10,27 +10,6 @@ import kotlin.math.sqrt
 
 fun main() {
 
-    fun smallestNumber(time:Long,distance:Long) {
-          var lo = 0L
-          var high = time
-
-
-          while (lo <= high) {
-              val speed =  lo + (high - lo) / 2
-              val distance1 = (time - speed) * speed
-              if(distance1 < distance) {
-                  lo = speed + 1
-              } else {
-                  high = speed - 1
-              }
-
-          }
-
-        lo.println()
-//        high.println()
-
-
-    }
     fun part1(input: List<String>): Int {
         val numbersMatch = Regex("\\d+")
         val time = numbersMatch.findAll(input[0]).map { it.value.toInt() }
