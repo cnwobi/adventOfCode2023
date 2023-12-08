@@ -4,6 +4,8 @@ import java.math.BigInteger
 import java.security.MessageDigest
 import kotlin.io.path.Path
 import kotlin.io.path.readLines
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Reads lines from the given input txt file.
@@ -21,4 +23,16 @@ fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteA
  * The cleaner shorthand for printing output.
  */
 fun Any?.println() = println(this)
-
+fun gcd(k: Long, m: Long): Long {
+    var x = max(k, m)
+    var y = min(k, m)
+    while (y != 0L) {
+        val r = x % y
+        x = y
+        y = r
+    }
+    return x
+}
+fun lcm(x: Long, y: Long): Long {
+    return (x * y) / gcd(x, y)
+}
