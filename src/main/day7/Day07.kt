@@ -13,10 +13,10 @@ data class Hand(val cards: List<String>, val bid: Long = 0) {
     private val cardToValue: MutableMap<String, Int> = mutableMapOf("A" to 50, "K" to 40, "Q" to 30, "J" to 20, "T" to 10)
     private val cardToValueWildCard: MutableMap<String, Int> = mutableMapOf("A" to 50, "K" to 40, "Q" to 30, "T" to 10, "J" to 1)
     private val countByCard = cards.groupingBy { it }.eachCount()
-    private val type = rank()
-    private val typeWildcard = rankWithWildCard()
+    private val type = value()
+    private val typeWildcard = valueWithWildCard()
 
-    private fun rank(): Type {
+    private fun value(): Type {
         val uniqueCards = countByCard.keys.size
         if (uniqueCards == 5) return Type.HIGH_CARD
         if (uniqueCards == 1) return Type.FIVE_OF_KIND
@@ -24,12 +24,11 @@ data class Hand(val cards: List<String>, val bid: Long = 0) {
         if (uniqueCards == 2 && countByCard.values.any { it == 3 }) return Type.FULL_HOUSE
         if (uniqueCards == 3 && countByCard.values.any { it == 3 }) return Type.THREE_OF_KIND
         if (countByCard.values.count { it == 2 } == 2) return Type.TWO_PAIR
-        if (countByCard.values.count { it == 2 } == 1) return Type.ONE_PAIR
-        throw IllegalArgumentException("Unknown card")
+        return Type.ONE_PAIR
     }
 
-    fun rankWithWildCard(): Type {
-        if (!countByCard.containsKey("J")) return rank()
+    fun valueWithWildCard(): Type {
+        if (!countByCard.containsKey("J")) return value()
 
         val wildcards = countByCard["J"]!!
         if (wildcards == 5 || wildcards == 4) return Type.FIVE_OF_KIND
