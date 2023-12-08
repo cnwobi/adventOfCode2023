@@ -6,12 +6,15 @@ import java.lang.Exception
 import java.lang.IllegalArgumentException
 
 enum class Type(val value: Int) {
-    FIVE_OF_KIND(7), FOUR_OF_KIND(6), FULL_HOUSE(5), THREE_OF_KIND(4), TWO_PAIR(3), ONE_PAIR(2), HIGH_CARD(1)
+    FIVE_OF_KIND(7), FOUR_OF_KIND(6), FULL_HOUSE(5), THREE_OF_KIND(4),
+    TWO_PAIR(3), ONE_PAIR(2), HIGH_CARD(1)
 }
 
 data class Hand(val cards: List<String>, val bid: Long = 0) {
-    private val cardToValue: MutableMap<String, Int> = mutableMapOf("A" to 50, "K" to 40, "Q" to 30, "J" to 20, "T" to 10)
-    private val cardToValueWildCard: MutableMap<String, Int> = mutableMapOf("A" to 50, "K" to 40, "Q" to 30, "T" to 10, "J" to 1)
+    private val cardToValue =
+        mutableMapOf("A" to 50, "K" to 40, "Q" to 30, "J" to 20, "T" to 10)
+    private val cardToValueWildCard =
+        mutableMapOf("A" to 50, "K" to 40, "Q" to 30, "T" to 10, "J" to 1)
     private val countByCard = cards.groupingBy { it }.eachCount()
     private val type = value()
     private val typeWildcard = valueWithWildCard()
@@ -53,11 +56,15 @@ data class Hand(val cards: List<String>, val bid: Long = 0) {
         throw IllegalArgumentException("Unknown J Configuration $cards")
     }
 
-    fun compare(other: Hand): Int = if (type == other.type) tieBreak(other, cardToValue) else type.value - other.type.value
-    fun compareWithWildcard(other: Hand): Int = if (typeWildcard == other.typeWildcard) tieBreak(other, cardToValueWildCard) else typeWildcard.value - other.typeWildcard.value
+    fun compare(other: Hand): Int =
+        if (type == other.type) tieBreak(other, cardToValue) else type.value - other.type.value
+
+    fun compareWithWildcard(other: Hand): Int =
+        if (typeWildcard == other.typeWildcard) tieBreak(other, cardToValueWildCard)
+        else typeWildcard.value - other.typeWildcard.value
 
     private fun value(idx: Int, cardToValue: Map<String, Int>) = cardToValue[cards[idx]]
-            ?: cards[idx].toInt()
+        ?: cards[idx].toInt()
 
     private fun tieBreak(other: Hand, cardToValue: Map<String, Int>): Int {
         for (idx in other.cards.indices) {
@@ -74,7 +81,7 @@ fun toCards(input: List<String>) = input.map { line ->
 }
 
 fun scoreCards(input: List<String>, comparator: Comparator<Hand>) =
-        toCards(input).sortedWith(comparator).mapIndexed { idx, card -> (idx + 1) * card.bid }.sum()
+    toCards(input).sortedWith(comparator).mapIndexed { idx, card -> (idx + 1) * card.bid }.sum()
 
 fun main() {
     fun part1(input: List<String>) = scoreCards(input) { o1, o2 -> o1.compare(o2) }
