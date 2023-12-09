@@ -55,6 +55,8 @@ fun main() {
     fun part2(input: List<String>): Long {
         val (instructions, map) = locationMap(input)
         val locations = map.keys.filter { it.endsWith("A") }
+        map.filterKeys { it.endsWith("Z")  }.println()
+        map.filterKeys { it.endsWith("A") }.println()
         val countToFirstZ = locations.map { countToFirstZ(it, map, instructions) }
         return countToFirstZ.fold(countToFirstZ.first()) { acc, i -> lcm(acc, i) }
     }

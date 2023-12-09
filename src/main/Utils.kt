@@ -26,11 +26,7 @@ fun Any?.println() = println(this)
 fun gcd(k: Long, m: Long): Long {
     var x = max(k, m)
     var y = min(k, m)
-    while (y != 0L) {
-        val r = x % y
-        x = y
-        y = r
-    }
+    while (y != 0L) x = y.also { y = x % y }
     return x
 }
 fun lcm(x: Long, y: Long): Long {
