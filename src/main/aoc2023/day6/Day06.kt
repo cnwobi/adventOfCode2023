@@ -1,11 +1,7 @@
-package day6
+package main.aoc2023.day6
 
-import main.println
-import main.readInput
-import kotlin.math.ceil
-import kotlin.math.floor
-import kotlin.math.pow
-import kotlin.math.sqrt
+import main.aoc2023.println
+import main.aoc2023.readInput
 
 
 fun main() {
@@ -25,7 +21,7 @@ fun main() {
         return (0..time).map { speed -> (time - speed) * speed }.count { it > distance }
     }
 
-    val input = readInput("day6/day06")
+    val input = readInput("aoc2023/day6/day06")
     part1(input).println()
     part2(input).println()
 

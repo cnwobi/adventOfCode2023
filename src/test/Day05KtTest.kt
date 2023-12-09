@@ -1,7 +1,7 @@
 import day5.Range
 import day5.RangedState
 import day5.rangedStateToNextStates
-import main.println
+import main.aoc2023.println
 import kotlin.test.Test
 import kotlin.test.expect
 

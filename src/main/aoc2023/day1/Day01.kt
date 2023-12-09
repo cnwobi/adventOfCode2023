@@ -1,7 +1,7 @@
-package main.day1
+package main.aoc2023.day1
 
-import main.println
-import main.readInput
+import main.aoc2023.println
+import main.aoc2023.readInput
 
 fun main() {
     fun part1(input: List<String>): Int {
@@ -27,7 +27,7 @@ fun main() {
     }
 
 
-    val input = readInput("day1/Day01")
+    val input = readInput("aoc2023/day1/Day01")
     part1(input).println()
     part2(input).println()
 

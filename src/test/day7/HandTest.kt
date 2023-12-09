@@ -1,7 +1,7 @@
 package day7
 
-import main.day7.Hand
-import main.day7.Type
+import main.aoc2023.day7.Hand
+import main.aoc2023.day7.Type
 import org.junit.jupiter.api.Test
 
 import kotlin.test.expect

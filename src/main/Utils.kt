@@ -1,4 +1,4 @@
-package main
+package main.aoc2023
 
 import java.math.BigInteger
 import java.security.MessageDigest

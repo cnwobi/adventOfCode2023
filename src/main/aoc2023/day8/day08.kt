@@ -1,9 +1,9 @@
-package main.day8
+package main.aoc2023.day8
 
 
-import main.lcm
-import main.println
-import main.readInput
+import main.aoc2023.lcm
+import main.aoc2023.println
+import main.aoc2023.readInput
 
 fun main() {
     fun locationMap(input: List<String>): Pair<List<String>, Map<String, Pair<String, String>>> {
@@ -61,9 +61,9 @@ fun main() {
         return countToFirstZ.fold(countToFirstZ.first()) { acc, i -> lcm(acc, i) }
     }
 
-    val testInput = readInput("day8/sample2")
+    val testInput = readInput("aoc2023/day8/sample2")
     check(part1(testInput) == 6)
-    val input = readInput("day8/day08")
+    val input = readInput("aoc2023/day8/day08")
     part1(input).println()
     part2(input).println()
 }

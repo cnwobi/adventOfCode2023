@@ -1,7 +1,7 @@
-package main.day4
+package main.aoc2023.day4
 
-import main.println
-import main.readInput
+import main.aoc2023.println
+import main.aoc2023.readInput
 import java.util.LinkedList
 import java.util.Queue
 import kotlin.math.pow
@@ -46,7 +46,7 @@ fun main() {
         return processedCards.size
     }
 
-    val input = readInput("day4/day04")
+    val input = readInput("aoc2023/day4/day04")
     part1(input).println()
     part2(input).println()
 }

@@ -1,8 +1,8 @@
-package main.day2
+package main.aoc2023.day2
 
 
-import main.println
-import main.readInput
+import main.aoc2023.println
+import main.aoc2023.readInput
 
 data class Cube(val count: Int, val color: String)
 data class Game(val id: Int, val cubes: List<Cube>) {
@@ -23,7 +23,7 @@ fun lineToGame(line: String): Game {
 fun main() {
     fun part1(input: List<String>): Int = input.map { lineToGame(it) }.filter { it.isValid() }.sumOf { it.id }
     fun part2(input: List<String>): Int = input.map { lineToGame(it) }.sumOf { it.powerOfCubes() }
-    val input = readInput("day2/Day02")
+    val input = readInput("aoc2023/day2/Day02")
     part1(input).println()
     part2(input).println()
 }

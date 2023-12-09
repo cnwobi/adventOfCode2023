@@ -1,7 +1,7 @@
-package main.day3
+package main.aoc2023.day3
 
-import main.println
-import main.readInput
+import main.aoc2023.println
+import main.aoc2023.readInput
 
 
 data class Point(val row: Int, val col: Int)
@@ -78,7 +78,7 @@ fun main() {
     }
 
 
-    val input = readInput("day3/Day03")
+    val input = readInput("aoc2023/day3/Day03")
     part1(input).println()
     part2(input).println()
 }
