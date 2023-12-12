@@ -1,4 +1,4 @@
-package main.aoc2023.day9
+package aoc2023.day9
 
 import main.aoc2023.println
 import main.aoc2023.readInput
