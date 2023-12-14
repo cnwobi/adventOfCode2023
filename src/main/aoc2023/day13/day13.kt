@@ -14,7 +14,7 @@ fun grids(input:List<String>):List<List<String>> {
 fun findSumOfMirrorLines(grid: List<String>):Int {
     val horizontalLines = mutableListOf<Int>()
     for(idx in (0 until grid.size - 1)) {
-        if (findDiff(grid[idx],grid[idx+1]).isEmpty()) {
+        if (findDiff(grid[idx], grid[idx + 1]).isEmpty()) {
             if (checkIfMirrored(idx, grid)) horizontalLines.add(idx+1)
         }
     }
@@ -51,7 +51,11 @@ private fun checkIfMirrored(idx: Int, grid: List<String>): Boolean {
 fun main() {
     fun part1(input: List<String>): Int {
         return  grids(input).sumOf {
-            findSumOfMirrorLines(it)*100 + findSumOfMirrorLines(gridTranspose(it))
+            findSumOfMirrorLines(it) *100 + findSumOfMirrorLines(
+                gridTranspose(
+                    it
+                )
+            )
         }
     }
 
