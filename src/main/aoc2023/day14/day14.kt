@@ -31,12 +31,8 @@ fun main() {
                             newMap[iprime + 1][j] = 'O'
                             break
                         }
-                        if (iprime == 0) {
-                            newMap[iprime][j] = 'O'
-                        }
+                        if (iprime == 0) newMap[iprime][j] = 'O'
                         iprime--
-
-
                     }
                 }
 
@@ -45,32 +41,10 @@ fun main() {
         return newMap
     }
 
-    fun process_col(col:Int,grid: List<List<Char>>): Int {
-        var row = 0
-        var ans = 0
-        while (row < grid.size) {
-            while (row < grid.size && grid[row][col] == '#')
-                row +=1
-            var count = 0
-            val start = row
-            while (row < grid.size && grid[row][col] != '#') {
-                if (grid[row][col] == '0') {
-                    count += 1
-                }
-                row += 1
-            }
 
-            for (i in start until start + count ) {
-                ans += row - i
-            }
-        }
-        return ans
+    fun cycle(curr:List<List<Char>>): List<List<Char>> =
+        transpose(rollNorth(transpose(rollNorth(transpose(rollNorth(transpose(rollNorth(curr))))))))
 
-    }
-
-    fun cycle(curr:List<List<Char>>): List<List<Char>> {
-        return transpose(rollNorth(transpose(rollNorth(transpose(rollNorth(transpose(rollNorth(curr))))))))
-    }
 
     fun part1(input: List<String>): Int {
         val oldMap = input.map {
@@ -86,20 +60,29 @@ fun main() {
 
 
     fun part2(input: List<String>): Int {
-        val oldMap = input.map {
-            it.map { it }
-        }
+        val stateToCycleSeen = mutableMapOf<List<List<Char>>,Int>()
+        val cycleToGrid = mutableMapOf<Int,List<List<Char>>>()
+        val oldMap = input.map { row -> row.map { it } }
         var curr = oldMap
-        for (i in 1 .. 1000000000) {
+        val maxCycles =1000000000
+        for (i in 1 .. maxCycles) {
             curr = cycle(curr)
+
+            if (curr in stateToCycleSeen) {
+                val lastSeen = stateToCycleSeen[curr]!!
+                val period = i - lastSeen
+                val remainingSteps = (maxCycles  - lastSeen) % period
+                curr = cycleToGrid[remainingSteps + lastSeen]!!
+                break
+            }
+            stateToCycleSeen[curr] = i
+            cycleToGrid[i] = curr
         }
 
-
-        return curr.mapIndexed{idx,row ->
-            row.count { it == 'O' } * (row.size - idx)
-        }.sum()
+        return curr.mapIndexed{idx,row -> row.count { it == 'O' } * (row.size - idx) }.sum()
     }
 
     val input = readInput("aoc2023/day14/day14")
+    part1(input).println()
     part2(input).println()
 }
