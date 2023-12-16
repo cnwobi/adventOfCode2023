@@ -25,10 +25,11 @@ fun processStep(
     if (step.contains("=")) {
         val (label, value) = step.split("=")
         acc.getOrPut(lensHash(label)) { Box() }.add(Lens(label, value.toInt()))
-    } else {
-        val label = step.split("-").first()
-        acc[lensHash(label)]?.remove(label)
+        return acc
     }
+
+    val label = step.split("-").first()
+    acc[lensHash(label)]?.remove(label)
     return acc
 }
 
