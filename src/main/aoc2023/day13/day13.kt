@@ -11,14 +11,21 @@ fun grids(input:List<String>):List<List<String>> {
     }
 }
 
-fun findSumOfMirrorLines(grid: List<String>):Int {
+fun findSumOfMirrorLines(grid: List<String>):Set<Int> {
     val horizontalLines = mutableListOf<Int>()
     for(idx in (0 until grid.size - 1)) {
-        if (findDiff(grid[idx], grid[idx + 1]).isEmpty()) {
-            if (checkIfMirrored(idx, grid)) horizontalLines.add(idx+1)
-        }
+        if (checkIfMirrored(idx, grid,0)) horizontalLines.add(idx+1)
+
     }
-    return horizontalLines.sum()
+    return horizontalLines.toSet()
+}
+
+fun findSumOfMirrorLines2(grid: List<String>):Set<Int> {
+    val horizontalLines = mutableListOf<Int>()
+    for(idx in (0 until grid.size - 1)) {
+        if (checkIfMirrored(idx, grid,1)) horizontalLines.add(idx+1)
+    }
+    return horizontalLines.toSet()
 }
 
 
@@ -30,17 +37,17 @@ fun gridTranspose(grid: List<String>):List<String> {
 
 }
 
-fun findDiff(line: String, line1: String): List<Int> {
+fun findDiff(line: String, line1: String,diff:Int): Boolean {
     val c = line.zip(line1).mapIndexed { idx, v -> Triple(idx, v.first, v.second) }
         .filter { it.second != it.third }.map { it.first }
-    return c
+    return c.size <= diff
 }
-private fun checkIfMirrored(idx: Int, grid: List<String>): Boolean {
-    var up = idx - 1
-    var down = idx + 2
+private fun checkIfMirrored(idx: Int, grid: List<String>,diff: Int): Boolean {
+    var up = idx
+    var down = idx + 1
     var isMirror = true
     while (up >= 0 && down < grid.size) {
-        isMirror = grid[up] == grid[down]
+        isMirror = findDiff(grid[up],grid[down],diff)
         if (!isMirror) break
         up--
         down++
@@ -51,16 +58,21 @@ private fun checkIfMirrored(idx: Int, grid: List<String>): Boolean {
 fun main() {
     fun part1(input: List<String>): Int {
         return  grids(input).sumOf {
-            findSumOfMirrorLines(it) *100 + findSumOfMirrorLines(
+            findSumOfMirrorLines(it).sum() *100 + findSumOfMirrorLines(
                 gridTranspose(
                     it
                 )
-            )
+            ).sum()
         }
     }
 
     fun part2(input: List<String>): Int {
-        return  0
+
+        return  grids(input).sumOf {
+            (findSumOfMirrorLines2(it) - findSumOfMirrorLines(it)).sum() *100 +
+                    (findSumOfMirrorLines2(gridTranspose(it)) - findSumOfMirrorLines(gridTranspose(it)).sum()
+            ).sum()
+        }
     }
 
     val input = readInput("aoc2023/day13/day13")
