@@ -23,7 +23,7 @@ fun lineToGame(line: String): Game {
 fun main() {
     fun part1(input: List<String>): Int = input.map { lineToGame(it) }.filter { it.isValid() }.sumOf { it.id }
     fun part2(input: List<String>): Int = input.map { lineToGame(it) }.sumOf { it.powerOfCubes() }
-    val input = readInput("aoc2023/day2/Day02")
+    val input = readInput("aoc2023/day02/Day02")
     part1(input).println()
     part2(input).println()
 }

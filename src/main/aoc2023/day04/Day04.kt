@@ -46,7 +46,7 @@ fun main() {
         return processedCards.size
     }
 
-    val input = readInput("aoc2023/day4/day04")
+    val input = readInput("aoc2023/day04/day04")
     part1(input).println()
     part2(input).println()
 }

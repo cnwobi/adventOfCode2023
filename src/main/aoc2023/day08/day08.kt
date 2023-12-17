@@ -61,9 +61,9 @@ fun main() {
         return countToFirstZ.fold(countToFirstZ.first()) { acc, i -> lcm(acc, i) }
     }
 
-    val testInput = readInput("aoc2023/day8/sample2")
+    val testInput = readInput("aoc2023/day08/sample2")
     check(part1(testInput) == 6)
-    val input = readInput("aoc2023/day8/day08")
+    val input = readInput("aoc2023/day08/day08")
     part1(input).println()
     part2(input).println()
 }

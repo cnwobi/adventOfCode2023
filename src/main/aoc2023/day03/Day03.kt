@@ -78,7 +78,7 @@ fun main() {
     }
 
 
-    val input = readInput("aoc2023/day3/Day03")
+    val input = readInput("aoc2023/day03/Day03")
     part1(input).println()
     part2(input).println()
 }

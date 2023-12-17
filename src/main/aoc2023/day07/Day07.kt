@@ -86,7 +86,7 @@ fun scoreCards(input: List<String>, comparator: Comparator<Hand>) =
 fun main() {
     fun part1(input: List<String>) = scoreCards(input) { o1, o2 -> o1.compare(o2) }
     fun part2(input: List<String>) = scoreCards(input) { o1, o2 -> o1.compareWithWildcard(o2) }
-    val input = readInput("aoc2023/day7/day07")
+    val input = readInput("aoc2023/day07/day07")
     part1(input).println()
     part2(input).println()
 }

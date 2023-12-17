@@ -1,4 +1,4 @@
-package aoc2023.day9
+package aoc2023.day09
 
 import main.aoc2023.println
 import main.aoc2023.readInput
@@ -14,7 +14,7 @@ fun main() {
     fun part1(input: List<String>) = input.map { lineToNums(it) }.sumOf { nextInSequence(it) }
     fun part2(input: List<String>) = input.map { lineToNums(it) }.sumOf { nextInSequence(it.reversed()) }
 
-    val input = readInput("aoc2023/day9/day09")
+    val input = readInput("aoc2023/day09/day09")
     part1(input).println()
     part2(input).println()
 }

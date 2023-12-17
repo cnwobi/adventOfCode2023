@@ -21,7 +21,7 @@ fun main() {
         return (0..time).map { speed -> (time - speed) * speed }.count { it > distance }
     }
 
-    val input = readInput("aoc2023/day6/day06")
+    val input = readInput("aoc2023/day06/day06")
     part1(input).println()
     part2(input).println()
 
