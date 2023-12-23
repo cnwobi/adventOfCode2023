@@ -1,5 +1,6 @@
 package main.aoc2023.aoc2023.day20
 
+import main.aoc2023.lcm
 import main.aoc2023.println
 import main.aoc2023.readInput
 import java.util.*
@@ -24,7 +25,11 @@ enum class ModuleType {
     }
 }
 
-data class Signal(val value: Value, val src: String, val dest: String)
+data class Signal(val value: Value, val src: String, val dest: String) {
+    fun isFirstHigh(src: String, dest: String): Boolean {
+        return this.src == src && this.dest == dest && this.value == Value.HIGH
+    }
+}
 
 data class Module(
     val input: MutableMap<String, Value> = mutableMapOf(),
@@ -33,7 +38,6 @@ data class Module(
     var value: Value? = null,
     var type: ModuleType? = null
 ) {
-
     private fun flipLevel(value: Value?) =
         if (value == Value.LOW || value == null) Value.HIGH else Value.LOW
 
@@ -44,10 +48,7 @@ data class Module(
 
         if (type == ModuleType.FLIP_FLOP && signal.value == Value.LOW) {
             value = flipLevel(value)
-            val signals: List<Signal> = outputs!!.map {
-                Signal(src = name, value = value!!, dest = it)
-            }
-            return signals
+            return outputs!!.map { Signal(value!!, name, it) }
         }
 
         if (type == ModuleType.CONJ) {
@@ -73,34 +74,31 @@ fun buildGraph(
 
 
         if (moduleNameStr.trim() == b) {
-            val m = Module(name = moduleNameStr.trim(), outputs = outputs, value = Value.LOW)
-            m.type = ModuleType.BROADCAST
-            graph[b] = m
+            graph[b] = Module(
+                name = moduleNameStr.trim(),
+                outputs = outputs,
+                value = Value.LOW,
+                type = ModuleType.BROADCAST
+            )
             outputs.forEach { outputName ->
-                val outPutModule = graph.getOrPut(outputName) {
+                graph.getOrPut(outputName) {
                     Module(
                         name = outputName,
                         value = Value.LOW
                     )
-                }
-                outPutModule.input[moduleNameStr] = Value.LOW
+                }.input[moduleNameStr] = Value.LOW
             }
 
         } else {
             val type = moduleNameStr.first()
             val moduleName = moduleNameStr.drop(1)
-            val module = graph.getOrPut(moduleName) {
-                Module(name = moduleName)
-            }
-
+            val module = graph.getOrPut(moduleName) { Module(name = moduleName) }
             module.type = ModuleType.toType(type)
             module.outputs = outputs
 
             outputs.forEach { outputName ->
-                val outPutModule = graph.getOrPut(outputName) {
-                    Module(name = outputName)
-                }
-                outPutModule.input[moduleName] = Value.LOW
+                graph.getOrPut(outputName) { Module(name = outputName) }.input[moduleName] =
+                    Value.LOW
             }
         }
     }
@@ -112,16 +110,23 @@ fun main() {
         val signals = mutableListOf<Signal>()
         val queue =
             ArrayDeque(listOf(Signal(src = "button", value = Value.LOW, dest = "broadcaster")))
-
         while (queue.isNotEmpty()) {
             val curr = queue.poll()
-
             signals.add(curr)
             queue.addAll(graph[curr.dest]!!.process(curr))
         }
         return signals
     }
 
+    fun countToFirstHigh(graph: Map<String, Module>, child: String, grandChild: String): Long {
+        var stop = false
+        var count = 0L
+        while (!stop) {
+            stop = buttonPress(graph).any { it.isFirstHigh(src = grandChild, dest = child) }
+            count++
+        }
+        return count
+    }
 
     fun part1(input: List<String>): Long {
         val graph = buildGraph(input)
@@ -133,25 +138,12 @@ fun main() {
             .fold(1L) { acc, l -> acc * l }
     }
 
-       fun part2(input: List<String>): Long {
+    fun part2(input: List<String>): Long {
         val graph = buildGraph(input)
-
-        var isKsOn = false
-
-        var count = 0
-
-
-        while (true) {
-            count += 1
-            val signals = buttonPress(graph)
-
-           val low =  signals.any{it == Signal(value = Value.HIGH, src = "pm", dest = "dt" )}
-            if(low) {
-//                count.println()
-                break
-            }
-        }
-        return 0
+        val child = graph["rx"]!!.input.keys.first()
+        val grandChildren = graph[child]!!.input.keys.toSet()
+        return grandChildren.map { countToFirstHigh(buildGraph(input), child, it) }
+            .fold(1L) { acc, l -> lcm(acc, l) }
     }
 
     val input = readInput("aoc2023/day20/day20")
